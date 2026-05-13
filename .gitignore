@@ -1,0 +1,11 @@
+node_modules/
+out/
+out-tsc/
+dist/
+dist-electron/
+.svelte-kit/
+.vite/
+coverage/
+*.tsbuildinfo
+*.log
+.DS_Store

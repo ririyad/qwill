@@ -1,0 +1,77 @@
+{
+  "name": "qwill",
+  "version": "0.1.0-draft",
+  "description": "A personal minimalist offline writing editor.",
+  "private": true,
+  "main": "./out/main/index.js",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "tsc -b && electron-vite build",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json --noEmit",
+    "preview": "electron-vite preview",
+    "dist": "pnpm build && electron-builder"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/lang-markdown": "^6.3.0",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/language-data": "^6.5.0",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.0",
+    "electron-store": "^10.0.0",
+    "howler": "^2.2.4",
+    "marked": "^15.0.0",
+    "svelte": "^5.0.0",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@types/howler": "^2.2.12",
+    "@types/node": "^22.0.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^3.0.0",
+    "svelte-check": "^4.0.0",
+    "tslib": "^2.8.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  },
+  "build": {
+    "appId": "io.rashed.qwill",
+    "productName": "qwill",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Office"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity"
+    }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild"
+    ]
+  }
+}

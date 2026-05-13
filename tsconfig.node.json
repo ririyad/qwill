@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.shared.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": [
+      "ES2022"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "out-tsc",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "electron/**/*.ts",
+    "electron.vite.config.ts",
+    "src/lib/default-settings.ts",
+    "src/types/**/*.ts"
+  ]
+}
