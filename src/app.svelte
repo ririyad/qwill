@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import DraftsRoute from './routes/drafts.svelte';
   import EditorRoute from './routes/editor.svelte';
+  import { loadDrafts, watchDrafts } from './stores/drafts.store';
   import { loadSettings, settings } from './stores/settings.store';
 
   let draftPanelOpen = $state(false);
@@ -22,6 +23,10 @@
 
   onMount(() => {
     void loadSettings();
+    void loadDrafts();
+
+    const unwatchDrafts = watchDrafts();
+    return unwatchDrafts;
   });
 </script>
 

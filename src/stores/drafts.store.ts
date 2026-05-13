@@ -10,3 +10,25 @@ export const filteredDrafts = derived([drafts, draftSearch], ([$drafts, $draftSe
 
   return $drafts.filter((draft) => draft.title.toLowerCase().includes(query));
 });
+
+export async function loadDrafts(): Promise<void> {
+  if (!canUseQwillApi()) return;
+
+  drafts.set(await window.qwill.files.list());
+}
+
+export function watchDrafts(): () => void {
+  if (!canUseQwillApi()) {
+    return () => undefined;
+  }
+
+  return window.qwill.on('drafts:changed', (nextDrafts) => {
+    if (Array.isArray(nextDrafts)) {
+      drafts.set(nextDrafts as DraftMeta[]);
+    }
+  });
+}
+
+function canUseQwillApi(): boolean {
+  return typeof window !== 'undefined' && Boolean(window.qwill);
+}
