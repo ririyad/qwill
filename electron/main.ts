@@ -7,6 +7,24 @@ import { registerWindowIpc } from './ipc/window';
 
 let mainWindow: BrowserWindow | null = null;
 
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!hasSingleInstanceLock) {
+  app.quit();
+}
+
+function isAllowedRendererNavigation(targetUrl: string): boolean {
+  if (!process.env.ELECTRON_RENDERER_URL) {
+    return targetUrl.startsWith('file://');
+  }
+
+  try {
+    return new URL(targetUrl).origin === new URL(process.env.ELECTRON_RENDERER_URL).origin;
+  } catch {
+    return false;
+  }
+}
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 1120,
@@ -14,13 +32,23 @@ function createWindow(): void {
     minWidth: 760,
     minHeight: 520,
     frame: false,
+    show: false,
     title: 'qwill',
     backgroundColor: '#FAFAF8',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false
+    }
+  });
+
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.on('will-navigate', (event, targetUrl) => {
+    if (!isAllowedRendererNavigation(targetUrl)) {
+      event.preventDefault();
     }
   });
 
@@ -30,23 +58,40 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
 
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
 
-app.whenReady().then(() => {
-  registerFilesIpc();
-  registerSettingsIpc();
-  registerShellIpc();
-  registerWindowIpc();
-  createWindow();
+if (hasSingleInstanceLock) {
+  app.whenReady().then(() => {
+    app.setName('qwill');
+    registerFilesIpc();
+    registerSettingsIpc();
+    registerShellIpc();
+    registerWindowIpc();
+    createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
   });
+}
+
+app.on('second-instance', () => {
+  if (!mainWindow) return;
+
+  if (mainWindow.isMinimized()) {
+    mainWindow.restore();
+  }
+
+  mainWindow.focus();
 });
 
 app.on('window-all-closed', () => {

@@ -10,7 +10,9 @@
 
 <div class="draft-panel-header">
   <h2>Drafts</h2>
-  <button class="icon-button" type="button" aria-label="Close drafts" onclick={onclose}>x</button>
+  <button class="icon-button" type="button" aria-label="Close drafts" onclick={onclose}>
+    <span class="chrome-icon chrome-icon-close" aria-hidden="true"></span>
+  </button>
 </div>
 
 <label class="search-field">

@@ -14,10 +14,18 @@
     draftPanelOpen = false;
   };
 
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      closeDraftPanel();
+    }
+  };
+
   onMount(() => {
     void loadSettings();
   });
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <svelte:head>
   <title>qwill</title>
@@ -30,14 +38,14 @@
 >
   <header class="titlebar">
     <button class="titlebar-button" type="button" aria-label="Toggle drafts" onclick={toggleDraftPanel}>
-      <span aria-hidden="true">=</span>
+      <span class="chrome-icon chrome-icon-menu" aria-hidden="true"></span>
     </button>
     <div class="titlebar-drag">
       <span class="app-name">qwill</span>
     </div>
     <div class="window-controls">
       <button class="window-button" type="button" aria-label="Minimize" onclick={() => window.qwill.window.minimize()}>
-        <span aria-hidden="true">_</span>
+        <span class="chrome-icon chrome-icon-minimize" aria-hidden="true"></span>
       </button>
       <button
         class="window-button"
@@ -45,10 +53,10 @@
         aria-label="Maximize or restore"
         onclick={() => window.qwill.window.toggleMaximize()}
       >
-        <span aria-hidden="true">[]</span>
+        <span class="chrome-icon chrome-icon-maximize" aria-hidden="true"></span>
       </button>
       <button class="window-button" type="button" aria-label="Close" onclick={() => window.qwill.window.close()}>
-        <span aria-hidden="true">x</span>
+        <span class="chrome-icon chrome-icon-close" aria-hidden="true"></span>
       </button>
     </div>
   </header>
