@@ -1,9 +1,5 @@
-import { app, ipcMain, shell } from 'electron';
-import { join } from 'node:path';
-
-export function getDraftsPath(): string {
-  return join(app.getPath('userData'), 'drafts');
-}
+import { ipcMain, shell } from 'electron';
+import { getDraftsPath } from '../lib/paths';
 
 export function registerShellIpc(): void {
   ipcMain.handle('shell:openDraftsFolder', async () => {

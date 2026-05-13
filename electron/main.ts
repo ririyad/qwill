@@ -4,6 +4,8 @@ import { registerFilesIpc } from './ipc/files';
 import { registerSettingsIpc } from './ipc/settings';
 import { registerShellIpc } from './ipc/shell';
 import { registerWindowIpc } from './ipc/window';
+import { DraftRepository } from './lib/draft-repository';
+import { getDraftsPath } from './lib/paths';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -68,9 +70,13 @@ function createWindow(): void {
 }
 
 if (hasSingleInstanceLock) {
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
     app.setName('qwill');
-    registerFilesIpc();
+
+    const draftRepository = new DraftRepository(getDraftsPath());
+    await draftRepository.initialize();
+
+    registerFilesIpc(draftRepository);
     registerSettingsIpc();
     registerShellIpc();
     registerWindowIpc();
