@@ -1,0 +1,60 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import DraftsRoute from './routes/drafts.svelte';
+  import EditorRoute from './routes/editor.svelte';
+  import { loadSettings, settings } from './stores/settings.store';
+
+  let draftPanelOpen = $state(false);
+
+  const toggleDraftPanel = () => {
+    draftPanelOpen = !draftPanelOpen;
+  };
+
+  const closeDraftPanel = () => {
+    draftPanelOpen = false;
+  };
+
+  onMount(() => {
+    void loadSettings();
+  });
+</script>
+
+<svelte:head>
+  <title>qwill</title>
+</svelte:head>
+
+<div
+  class="app-shell"
+  data-theme={$settings.theme}
+  style={`--font-size: ${$settings.fontSize}px; --line-height: ${$settings.lineHeight}; --max-width: ${$settings.maxLineWidth}px;`}
+>
+  <header class="titlebar">
+    <button class="titlebar-button" type="button" aria-label="Toggle drafts" onclick={toggleDraftPanel}>
+      <span aria-hidden="true">=</span>
+    </button>
+    <div class="titlebar-drag">
+      <span class="app-name">qwill</span>
+    </div>
+    <div class="window-controls">
+      <button class="window-button" type="button" aria-label="Minimize" onclick={() => window.qwill.window.minimize()}>
+        <span aria-hidden="true">_</span>
+      </button>
+      <button
+        class="window-button"
+        type="button"
+        aria-label="Maximize or restore"
+        onclick={() => window.qwill.window.toggleMaximize()}
+      >
+        <span aria-hidden="true">[]</span>
+      </button>
+      <button class="window-button" type="button" aria-label="Close" onclick={() => window.qwill.window.close()}>
+        <span aria-hidden="true">x</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <DraftsRoute open={draftPanelOpen} onclose={closeDraftPanel} />
+    <EditorRoute />
+  </main>
+</div>

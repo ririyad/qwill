@@ -1,0 +1,15 @@
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+  --font-body: Lora, Georgia, serif;
+  --font-size: 17px;
+  --line-height: 1.8;
+  --max-width: 680px;
+  --color-bg: #fafaf8;
+  --color-text: #1a1a1a;
+  --color-muted: #999999;
+  --color-accent: #5b6f58;
+  --color-surface: #f0efeb;
+  --color-border: #deddd8;
+  --color-shadow: rgb(26 26 26 / 10%);
+}

@@ -1,0 +1,255 @@
+@import './themes/light.css';
+@import './themes/dark.css';
+@import './themes/sepia.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: 38px 1fr;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.titlebar {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg) 92%, var(--color-surface));
+  user-select: none;
+}
+
+.titlebar-drag {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: drag;
+}
+
+.app-name {
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+.titlebar-button,
+.window-button,
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: default;
+}
+
+.titlebar-button:hover,
+.window-button:hover,
+.icon-button:hover {
+  background: var(--color-surface);
+}
+
+.window-controls {
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.workspace {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor-route {
+  display: grid;
+  grid-template-rows: 1fr 34px;
+  height: 100%;
+  min-height: 0;
+}
+
+.editor-column {
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+  padding: 56px 28px 32px;
+  overflow: auto;
+}
+
+.editor-surface {
+  width: min(100%, var(--max-width));
+  min-height: 100%;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+.editor-surface::placeholder {
+  color: var(--color-muted);
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.status-spacer {
+  flex: 1;
+}
+
+.draft-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border: 0;
+  background: transparent;
+}
+
+.draft-panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  width: 280px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 16px;
+  padding: 18px;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-bg);
+  box-shadow: 8px 0 24px var(--color-shadow);
+  transform: translateX(-100%);
+  transition: transform 160ms ease;
+}
+
+.draft-panel.open {
+  transform: translateX(0);
+}
+
+.draft-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.draft-panel-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.search-field input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.draft-list {
+  min-height: 0;
+  overflow: auto;
+}
+
+.draft-list-item {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  border: 0;
+  border-radius: 6px;
+  padding: 10px;
+  text-align: left;
+  background: transparent;
+}
+
+.draft-list-item:hover {
+  background: var(--color-surface);
+}
+
+.draft-list-item small,
+.empty-state {
+  color: var(--color-muted);
+}
+
+.new-draft-button,
+.theme-toggle {
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.command-palette {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  z-index: 30;
+  width: min(520px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--color-bg);
+  box-shadow: 0 20px 50px var(--color-shadow);
+}
+
+.command-palette input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

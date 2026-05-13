@@ -1,0 +1,10 @@
+[data-theme='sepia'] {
+  color-scheme: light;
+  --color-bg: #f5edd6;
+  --color-text: #3b2f1e;
+  --color-muted: #9e8a6c;
+  --color-accent: #8b6f47;
+  --color-surface: #ede0c4;
+  --color-border: #dccca9;
+  --color-shadow: rgb(59 47 30 / 14%);
+}
