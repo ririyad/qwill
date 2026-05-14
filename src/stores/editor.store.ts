@@ -9,6 +9,8 @@ export const isSaving = writable(false);
 export const wordCount = derived(content, ($content) => countWords($content));
 export const readingTime = derived(wordCount, ($wordCount) => estimateReadingTime($wordCount));
 
+let currentSave: Promise<void> | null = null;
+
 export function updateEditorContent(nextContent: string): void {
   content.set(nextContent);
   isDirty.set(true);
@@ -21,12 +23,28 @@ export function replaceEditorContent(nextContent: string, draftId: string | null
 }
 
 export async function openDraft(draftId: string): Promise<void> {
+  if (get(activeDraftId) === draftId) return;
+
+  await saveActiveDraft();
+
   const draftContent = await window.qwill.files.read(draftId);
   replaceEditorContent(draftContent, draftId);
 }
 
 export async function saveActiveDraft(): Promise<void> {
-  if (!window.qwill || get(isSaving)) return;
+  if (currentSave) {
+    return currentSave;
+  }
+
+  currentSave = persistActiveDraft().finally(() => {
+    currentSave = null;
+  });
+
+  return currentSave;
+}
+
+async function persistActiveDraft(): Promise<void> {
+  if (!window.qwill) return;
 
   const currentContent = get(content);
   const existingDraftId = get(activeDraftId);
