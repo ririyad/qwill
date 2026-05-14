@@ -349,26 +349,108 @@ button {
 .draft-list {
   min-height: 0;
   overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.draft-list-row {
+  display: grid;
+  gap: 2px;
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.draft-list-row.active {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  box-shadow: inset 2px 0 0 var(--color-accent);
 }
 
 .draft-list-item {
   width: 100%;
   display: grid;
   gap: 4px;
+  min-width: 0;
   border: 0;
   border-radius: 6px;
   padding: 10px;
   text-align: left;
   background: transparent;
+  color: var(--color-text);
 }
 
 .draft-list-item:hover {
   background: var(--color-surface);
 }
 
+.draft-list-item:disabled,
+.new-draft-button:disabled,
+.draft-action:disabled,
+.draft-rename-form input:disabled {
+  opacity: 0.62;
+}
+
+.draft-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.draft-actions {
+  display: flex;
+  gap: 6px;
+  padding: 0 6px 5px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.draft-list-row:hover .draft-actions,
+.draft-list-row:focus-within .draft-actions,
+.draft-list-row.active .draft-actions {
+  opacity: 1;
+}
+
+.draft-action {
+  border: 0;
+  border-radius: 4px;
+  padding: 2px 4px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.draft-action:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.draft-action.danger:hover {
+  color: #9b2f2f;
+}
+
+.draft-rename-form {
+  display: grid;
+  gap: 6px;
+}
+
+.draft-rename-form input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0 9px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 .draft-list-item small,
 .empty-state {
   color: var(--color-muted);
+}
+
+.empty-state {
+  margin: 8px 0;
+  padding: 0 2px;
 }
 
 .new-draft-button,
