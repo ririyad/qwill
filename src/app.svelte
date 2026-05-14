@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import DraftsRoute from './routes/drafts.svelte';
   import EditorRoute from './routes/editor.svelte';
-  import { loadDrafts, watchDrafts } from './stores/drafts.store';
+  import { createDraftAndOpen, loadDrafts, watchDrafts } from './stores/drafts.store';
   import { loadSettings, settings } from './stores/settings.store';
 
   let draftPanelOpen = $state(false);
@@ -15,9 +15,32 @@
     draftPanelOpen = false;
   };
 
+  const createDraftFromShortcut = async () => {
+    const draft = await createDraftAndOpen();
+
+    if (draft) {
+      closeDraftPanel();
+    }
+  };
+
   const handleKeydown = (event: KeyboardEvent) => {
+    const key = event.key.toLowerCase();
+    const usesPrimaryModifier = event.ctrlKey || event.metaKey;
+
     if (event.key === 'Escape') {
       closeDraftPanel();
+      return;
+    }
+
+    if (usesPrimaryModifier && !event.shiftKey && key === 'n') {
+      event.preventDefault();
+      void createDraftFromShortcut();
+      return;
+    }
+
+    if (usesPrimaryModifier && !event.shiftKey && key === 'b') {
+      event.preventDefault();
+      toggleDraftPanel();
     }
   };
 
