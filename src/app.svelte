@@ -1,11 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import CommandPalette from './components/CommandPalette.svelte';
+  import SettingsPanel from './components/SettingsPanel.svelte';
   import DraftsRoute from './routes/drafts.svelte';
   import EditorRoute from './routes/editor.svelte';
   import { createDraftAndOpen, loadDrafts, watchDrafts } from './stores/drafts.store';
-  import { loadSettings, settings } from './stores/settings.store';
+  import { loadSettings, settings, updateSettings, watchSettings } from './stores/settings.store';
 
   let draftPanelOpen = $state(false);
+  let commandPaletteOpen = $state(false);
+  let settingsPanelOpen = $state(false);
 
   const toggleDraftPanel = () => {
     draftPanelOpen = !draftPanelOpen;
@@ -13,6 +17,18 @@
 
   const closeDraftPanel = () => {
     draftPanelOpen = false;
+  };
+
+  const closeCommandPalette = () => {
+    commandPaletteOpen = false;
+  };
+
+  const openSettingsPanel = () => {
+    settingsPanelOpen = true;
+  };
+
+  const closeSettingsPanel = () => {
+    settingsPanelOpen = false;
   };
 
   const createDraftFromShortcut = async () => {
@@ -28,13 +44,39 @@
     const usesPrimaryModifier = event.ctrlKey || event.metaKey;
 
     if (event.key === 'Escape') {
+      closeSettingsPanel();
+      closeCommandPalette();
       closeDraftPanel();
+      return;
+    }
+
+    if (usesPrimaryModifier && !event.shiftKey && key === 'p') {
+      event.preventDefault();
+      commandPaletteOpen = !commandPaletteOpen;
+      return;
+    }
+
+    if (usesPrimaryModifier && !event.shiftKey && key === ',') {
+      event.preventDefault();
+      openSettingsPanel();
       return;
     }
 
     if (usesPrimaryModifier && !event.shiftKey && key === 'n') {
       event.preventDefault();
       void createDraftFromShortcut();
+      return;
+    }
+
+    if (usesPrimaryModifier && event.shiftKey && key === 'f') {
+      event.preventDefault();
+      void updateSettings({ focusModeDefault: !$settings.focusModeDefault });
+      return;
+    }
+
+    if (usesPrimaryModifier && event.shiftKey && key === 't') {
+      event.preventDefault();
+      void updateSettings({ typewriterMode: !$settings.typewriterMode });
       return;
     }
 
@@ -49,7 +91,12 @@
     void loadDrafts();
 
     const unwatchDrafts = watchDrafts();
-    return unwatchDrafts;
+    const unwatchSettings = watchSettings();
+
+    return () => {
+      unwatchSettings();
+      unwatchDrafts();
+    };
   });
 </script>
 
@@ -60,8 +107,10 @@
 </svelte:head>
 
 <div
+  class:focus-mode={$settings.focusModeDefault}
   class="app-shell"
   data-theme={$settings.theme}
+  data-font={$settings.font}
   style={`--font-size: ${$settings.fontSize}px; --line-height: ${$settings.lineHeight}; --max-width: ${$settings.maxLineWidth}px;`}
 >
   <header class="titlebar">
@@ -93,4 +142,13 @@
     <DraftsRoute open={draftPanelOpen} onclose={closeDraftPanel} />
     <EditorRoute />
   </main>
+
+  <CommandPalette
+    open={commandPaletteOpen}
+    onclose={closeCommandPalette}
+    onopenSettings={() => {
+      openSettingsPanel();
+    }}
+  />
+  <SettingsPanel open={settingsPanelOpen} onclose={closeSettingsPanel} />
 </div>
