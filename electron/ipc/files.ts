@@ -1,14 +1,11 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { DraftRepository } from '../lib/draft-repository';
-import type { DraftMeta } from '../../src/types/qwill';
+import { exportDraft, type ExportFormat } from '../lib/draft-exporter';
+import type { DraftMeta, ExportResult } from '../../src/types/qwill';
 
 interface FilesIpcOptions {
   onDraftWritten?: () => void;
 }
-
-const notImplemented = (): never => {
-  throw new Error('This export path will be implemented in Sprint 6.');
-};
 
 export function registerFilesIpc(repository: DraftRepository, options: FilesIpcOptions = {}): void {
   ipcMain.handle('files:list', (): DraftMeta[] => repository.list());
@@ -38,8 +35,17 @@ export function registerFilesIpc(repository: DraftRepository, options: FilesIpcO
     return draft;
   });
 
-  ipcMain.handle('files:exportPDF', notImplemented);
-  ipcMain.handle('files:exportTxt', notImplemented);
+  ipcMain.handle('files:exportMarkdown', (event, id: unknown): Promise<ExportResult> => {
+    return exportDraftById(repository, requireString(id, 'id'), 'markdown', BrowserWindow.fromWebContents(event.sender));
+  });
+
+  ipcMain.handle('files:exportPDF', (event, id: unknown): Promise<ExportResult> => {
+    return exportDraftById(repository, requireString(id, 'id'), 'pdf', BrowserWindow.fromWebContents(event.sender));
+  });
+
+  ipcMain.handle('files:exportTxt', (event, id: unknown): Promise<ExportResult> => {
+    return exportDraftById(repository, requireString(id, 'id'), 'txt', BrowserWindow.fromWebContents(event.sender));
+  });
 }
 
 function notifyDraftsChanged(repository: DraftRepository): void {
@@ -56,4 +62,19 @@ function requireString(value: unknown, name: string): string {
   }
 
   return value;
+}
+
+async function exportDraftById(
+  repository: DraftRepository,
+  id: string,
+  format: ExportFormat,
+  owner: BrowserWindow | null
+): Promise<ExportResult> {
+  const [meta, body] = await Promise.all([repository.getMeta(id), repository.read(id)]);
+  const path = await exportDraft({ meta, body, format, owner });
+
+  return {
+    canceled: path === null,
+    path
+  };
 }

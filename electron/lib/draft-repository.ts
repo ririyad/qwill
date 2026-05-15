@@ -32,6 +32,11 @@ export class DraftRepository {
     return [...this.index.values()].sort((a, b) => b.modified.localeCompare(a.modified));
   }
 
+  async getMeta(id: string): Promise<DraftMeta> {
+    const draftId = this.requireDraftId(id);
+    return this.index.get(draftId) ?? this.readMeta(draftId);
+  }
+
   async read(id: string): Promise<string> {
     const draftId = this.requireDraftId(id);
     const markdown = await readFile(this.getDraftPath(draftId), 'utf8');

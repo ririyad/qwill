@@ -33,6 +33,11 @@ export interface DraftMeta {
   preview: string;
 }
 
+export interface ExportResult {
+  canceled: boolean;
+  path: string | null;
+}
+
 export interface FileApi {
   list: () => Promise<DraftMeta[]>;
   read: (id: string) => Promise<string>;
@@ -40,8 +45,9 @@ export interface FileApi {
   create: (title: string) => Promise<DraftMeta>;
   delete: (id: string) => Promise<void>;
   rename: (id: string, title: string) => Promise<DraftMeta>;
-  exportPDF: (id: string) => Promise<void>;
-  exportTxt: (id: string) => Promise<void>;
+  exportMarkdown: (id: string) => Promise<ExportResult>;
+  exportPDF: (id: string) => Promise<ExportResult>;
+  exportTxt: (id: string) => Promise<ExportResult>;
 }
 
 export interface SettingsApi {

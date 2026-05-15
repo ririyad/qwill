@@ -11,6 +11,7 @@ const api: QwillApi = {
     create: (title: string) => ipcRenderer.invoke('files:create', title),
     delete: (id: string) => ipcRenderer.invoke('files:delete', id),
     rename: (id: string, title: string) => ipcRenderer.invoke('files:rename', id, title),
+    exportMarkdown: (id: string) => ipcRenderer.invoke('files:exportMarkdown', id),
     exportPDF: (id: string) => ipcRenderer.invoke('files:exportPDF', id),
     exportTxt: (id: string) => ipcRenderer.invoke('files:exportTxt', id)
   },
