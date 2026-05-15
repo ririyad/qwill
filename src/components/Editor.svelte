@@ -5,6 +5,7 @@
   import { createEditorState, typewriterCompartment } from '../lib/codemirror/editor-extensions';
   import { typewriterScrollExtension } from '../lib/codemirror/typewriter';
   import { createAutosave } from '../lib/autosave';
+  import { destroySessionTimer, recordWritingActivity } from '../lib/time/session-timer';
   import { content, saveActiveDraft, updateEditorContent } from '../stores/editor.store';
   import { settings } from '../stores/settings.store';
 
@@ -22,6 +23,7 @@
           if (isApplyingStoreUpdate) return;
 
           updateEditorContent(nextContent);
+          recordWritingActivity();
           autosave.onChange();
         }
       })
@@ -62,6 +64,7 @@
   });
 
   onDestroy(() => {
+    destroySessionTimer();
     autosave.destroy();
   });
 </script>
