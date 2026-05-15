@@ -526,6 +526,13 @@ button {
   padding-top: 8px;
 }
 
+.command-status {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 .command-item {
   height: 36px;
   border: 0;

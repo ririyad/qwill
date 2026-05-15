@@ -1,5 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { get } from 'svelte/store';
+  import { activeDraftId, saveActiveDraft } from '../stores/editor.store';
   import { settings, updateSettings } from '../stores/settings.store';
   import type { Theme } from '../types/qwill';
 
@@ -11,11 +13,13 @@
 
   let { open, onclose, onopenSettings }: Props = $props();
   let query = $state('');
+  let statusMessage = $state('');
   let commandInput = $state<HTMLInputElement>();
 
   interface Command {
     label: string;
     run: () => void | Promise<void>;
+    closeOnRun?: boolean;
   }
 
   const themes: Theme[] = ['light', 'dark', 'sepia'];
@@ -24,6 +28,31 @@
     const currentIndex = themes.indexOf($settings.theme);
     const theme = themes[(currentIndex + 1) % themes.length];
     void updateSettings({ theme });
+  };
+
+  const exportActiveDraft = async (format: 'markdown' | 'txt' | 'pdf') => {
+    statusMessage = '';
+
+    try {
+      await saveActiveDraft();
+
+      const draftId = get(activeDraftId);
+      if (!draftId) {
+        statusMessage = 'Nothing to export yet.';
+        return;
+      }
+
+      const result =
+        format === 'markdown'
+          ? await window.qwill.files.exportMarkdown(draftId)
+          : format === 'txt'
+            ? await window.qwill.files.exportTxt(draftId)
+            : await window.qwill.files.exportPDF(draftId);
+
+      statusMessage = result.canceled ? 'Export canceled.' : `Exported to ${result.path}`;
+    } catch (error) {
+      statusMessage = error instanceof Error ? error.message : 'Export failed.';
+    }
   };
 
   const commands = $derived<Command[]>([
@@ -44,6 +73,21 @@
       run: () => window.qwill.shell.openDraftsFolder()
     },
     {
+      label: 'Export as PDF',
+      run: () => exportActiveDraft('pdf'),
+      closeOnRun: false
+    },
+    {
+      label: 'Export as Markdown',
+      run: () => exportActiveDraft('markdown'),
+      closeOnRun: false
+    },
+    {
+      label: 'Export as Plain Text',
+      run: () => exportActiveDraft('txt'),
+      closeOnRun: false
+    },
+    {
       label: 'Settings',
       run: onopenSettings
     }
@@ -55,8 +99,11 @@
 
   const runCommand = async (command: Command) => {
     await command.run();
-    query = '';
-    onclose();
+    if (command.closeOnRun ?? true) {
+      query = '';
+      statusMessage = '';
+      onclose();
+    }
   };
 
   const handleKeydown = (event: KeyboardEvent) => {
@@ -65,6 +112,7 @@
     if (event.key === 'Escape') {
       event.preventDefault();
       query = '';
+      statusMessage = '';
       onclose();
     }
   };
@@ -83,6 +131,10 @@
 
   <div class="command-palette" role="dialog" aria-label="Command palette" tabindex="-1" onkeydown={handleKeydown}>
     <input bind:this={commandInput} bind:value={query} type="search" placeholder="Command" />
+
+    {#if statusMessage}
+      <p class="command-status">{statusMessage}</p>
+    {/if}
 
     <div class="command-list">
       {#if filteredCommands.length === 0}
