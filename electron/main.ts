@@ -6,6 +6,7 @@ import { registerShellIpc } from './ipc/shell';
 import { registerWindowIpc } from './ipc/window';
 import { DraftRepository } from './lib/draft-repository';
 import { getDraftsPath } from './lib/paths';
+import { SettingsStore } from './lib/settings-store';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -74,10 +75,13 @@ if (hasSingleInstanceLock) {
     app.setName('qwill');
 
     const draftRepository = new DraftRepository(getDraftsPath());
+    const settingsStore = new SettingsStore();
     await draftRepository.initialize();
 
-    registerFilesIpc(draftRepository);
-    registerSettingsIpc();
+    registerFilesIpc(draftRepository, {
+      onDraftWritten: () => settingsStore.recordWritingDay()
+    });
+    registerSettingsIpc(settingsStore);
     registerShellIpc();
     registerWindowIpc();
     createWindow();

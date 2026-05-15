@@ -1,13 +1,11 @@
 import { ipcMain } from 'electron';
-import { defaultSettings } from '../../src/lib/default-settings';
+import type { SettingsStore } from '../lib/settings-store';
 import type { Settings } from '../../src/types/qwill';
 
-let settings: Settings = { ...defaultSettings };
-
-export function registerSettingsIpc(): void {
-  ipcMain.handle('settings:get', () => settings);
+export function registerSettingsIpc(settingsStore: SettingsStore): void {
+  ipcMain.handle('settings:get', () => settingsStore.getSettings());
   ipcMain.handle('settings:set', (_event, patch: Partial<Settings>) => {
-    settings = { ...settings, ...patch };
-    return settings;
+    return settingsStore.setSettings(patch);
   });
+  ipcMain.handle('settings:getWritingStats', () => settingsStore.getWritingStats());
 }

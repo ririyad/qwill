@@ -17,6 +17,12 @@ export interface Settings {
   focusModeDefault: boolean;
 }
 
+export interface WritingStats {
+  dates: string[];
+  currentStreak: number;
+  wroteToday: boolean;
+}
+
 export interface DraftMeta {
   id: string;
   title: string;
@@ -41,6 +47,7 @@ export interface FileApi {
 export interface SettingsApi {
   get: () => Promise<Settings>;
   set: (patch: Partial<Settings>) => Promise<Settings>;
+  getWritingStats: () => Promise<WritingStats>;
 }
 
 export interface ShellApi {

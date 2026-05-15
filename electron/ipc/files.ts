@@ -2,17 +2,22 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { DraftRepository } from '../lib/draft-repository';
 import type { DraftMeta } from '../../src/types/qwill';
 
+interface FilesIpcOptions {
+  onDraftWritten?: () => void;
+}
+
 const notImplemented = (): never => {
   throw new Error('This export path will be implemented in Sprint 6.');
 };
 
-export function registerFilesIpc(repository: DraftRepository): void {
+export function registerFilesIpc(repository: DraftRepository, options: FilesIpcOptions = {}): void {
   ipcMain.handle('files:list', (): DraftMeta[] => repository.list());
 
   ipcMain.handle('files:read', (_event, id: unknown): Promise<string> => repository.read(requireString(id, 'id')));
 
   ipcMain.handle('files:write', async (_event, id: unknown, content: unknown): Promise<void> => {
     await repository.write(requireString(id, 'id'), requireString(content, 'content'));
+    options.onDraftWritten?.();
     notifyDraftsChanged(repository);
   });
 

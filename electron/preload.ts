@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { QwillApi, Settings } from '../src/types/qwill';
 
-const allowedEvents = new Set<string>(['drafts:changed', 'settings:changed']);
+const allowedEvents = new Set<string>(['drafts:changed', 'settings:changed', 'writingStats:changed']);
 
 const api: QwillApi = {
   files: {
@@ -16,7 +16,8 @@ const api: QwillApi = {
   },
   settings: {
     get: () => ipcRenderer.invoke('settings:get'),
-    set: (patch: Partial<Settings>) => ipcRenderer.invoke('settings:set', patch)
+    set: (patch: Partial<Settings>) => ipcRenderer.invoke('settings:set', patch),
+    getWritingStats: () => ipcRenderer.invoke('settings:getWritingStats')
   },
   shell: {
     openDraftsFolder: () => ipcRenderer.invoke('shell:openDraftsFolder')
