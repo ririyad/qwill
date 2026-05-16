@@ -5,10 +5,12 @@ import { registerSettingsIpc } from './ipc/settings';
 import { registerShellIpc } from './ipc/shell';
 import { registerWindowIpc } from './ipc/window';
 import { DraftRepository } from './lib/draft-repository';
+import { runPackagedDraftSmokeTest } from './lib/packaged-smoke-test';
 import { getDraftsPath } from './lib/paths';
 import { SettingsStore } from './lib/settings-store';
 
 let mainWindow: BrowserWindow | null = null;
+const DRAFT_SMOKE_TEST_ARG = '--qwill-smoke-test-drafts';
 
 const hasSingleInstanceLock = app.requestSingleInstanceLock();
 
@@ -74,9 +76,22 @@ if (hasSingleInstanceLock) {
   app.whenReady().then(async () => {
     app.setName('qwill');
 
-    const draftRepository = new DraftRepository(getDraftsPath());
+    const draftsPath = getDraftsPath();
+    const draftRepository = new DraftRepository(draftsPath);
     const settingsStore = new SettingsStore();
     await draftRepository.initialize();
+
+    if (process.argv.includes(DRAFT_SMOKE_TEST_ARG)) {
+      try {
+        await runPackagedDraftSmokeTest(draftRepository, draftsPath);
+        app.exit(0);
+      } catch (error) {
+        console.error(error);
+        app.exit(1);
+      }
+
+      return;
+    }
 
     registerFilesIpc(draftRepository, {
       onDraftWritten: () => settingsStore.recordWritingDay()
