@@ -2,6 +2,7 @@
   "name": "qwill",
   "version": "0.1.0-draft",
   "description": "A personal minimalist offline writing editor.",
+  "author": "Rashed",
   "private": true,
   "main": "./out/main/index.js",
   "packageManager": "pnpm@10.11.0",
@@ -10,7 +11,11 @@
     "build": "tsc -b && electron-vite build",
     "typecheck": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json --noEmit",
     "preview": "electron-vite preview",
-    "dist": "pnpm build && electron-builder"
+    "icons": "node scripts/generate-icons.mjs",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac dmg --arm64",
+    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "dist:linux": "npm run build && electron-builder --linux AppImage deb --x64"
   },
   "dependencies": {
     "@codemirror/commands": "^6.8.0",
@@ -39,21 +44,33 @@
   },
   "build": {
     "appId": "io.rashed.qwill",
-    "productName": "qwill",
+    "productName": "Qwill",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
+      "buildResources": "build",
       "output": "dist-electron"
     },
     "files": [
       "out/**/*"
     ],
+    "asar": true,
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
+      "icon": "build/icon.png",
       "category": "Office"
     },
     "mac": {
@@ -65,6 +82,8 @@
           ]
         }
       ],
+      "icon": "build/icon.icns",
+      "identity": null,
       "category": "public.app-category.productivity"
     }
   },
