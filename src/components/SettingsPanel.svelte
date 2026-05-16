@@ -1,4 +1,10 @@
 <script lang="ts">
+  import {
+    ambientSoundError,
+    ambientSoundPlaying,
+    startAmbientSound,
+    stopAmbientSound
+  } from '../lib/sound/ambient-sound';
   import { settings, updateSettings } from '../stores/settings.store';
   import type { AmbientSound, FontFamily, Theme } from '../types/qwill';
 
@@ -12,6 +18,21 @@
   const themes: Theme[] = ['light', 'dark', 'sepia'];
   const fonts: FontFamily[] = ['lora', 'ia-writer-quattro', 'merriweather', 'georgia', 'system'];
   const ambientSounds: AmbientSound[] = ['none', 'rain', 'cafe', 'white-noise'];
+
+  const toggleAmbientSound = async () => {
+    if ($ambientSoundPlaying) {
+      stopAmbientSound();
+      return;
+    }
+
+    const ambientSound = $settings.ambientSound === 'none' ? 'rain' : $settings.ambientSound;
+
+    if ($settings.ambientSound === 'none') {
+      await updateSettings({ ambientSound });
+    }
+
+    startAmbientSound({ ambientSound, ambientVolume: $settings.ambientVolume });
+  };
 </script>
 
 {#if open}
@@ -109,6 +130,15 @@
           oninput={(event) => updateSettings({ ambientVolume: Number(event.currentTarget.value) })}
         />
       </label>
+
+      <div class="sound-control">
+        <button class="settings-button" type="button" onclick={toggleAmbientSound}>
+          {$ambientSoundPlaying ? 'Stop ambient sound' : 'Start ambient sound'}
+        </button>
+        {#if $ambientSoundError}
+          <p>{$ambientSoundError}</p>
+        {/if}
+      </div>
     </div>
 
     <div class="settings-toggles">

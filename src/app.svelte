@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import CommandPalette from './components/CommandPalette.svelte';
   import SettingsPanel from './components/SettingsPanel.svelte';
+  import { stopAmbientSound, syncAmbientSound } from './lib/sound/ambient-sound';
   import DraftsRoute from './routes/drafts.svelte';
   import EditorRoute from './routes/editor.svelte';
   import { createDraftAndOpen, loadDrafts, watchDrafts } from './stores/drafts.store';
@@ -92,8 +93,13 @@
 
     const unwatchDrafts = watchDrafts();
     const unwatchSettings = watchSettings();
+    const unwatchAmbientSound = settings.subscribe((nextSettings) => {
+      syncAmbientSound(nextSettings);
+    });
 
     return () => {
+      stopAmbientSound();
+      unwatchAmbientSound();
       unwatchSettings();
       unwatchDrafts();
     };

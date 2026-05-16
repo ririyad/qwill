@@ -1,6 +1,11 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import { get } from 'svelte/store';
+  import {
+    ambientSoundPlaying,
+    startAmbientSound,
+    stopAmbientSound
+  } from '../lib/sound/ambient-sound';
   import { activeDraftId, saveActiveDraft } from '../stores/editor.store';
   import { settings, updateSettings } from '../stores/settings.store';
   import type { Theme } from '../types/qwill';
@@ -28,6 +33,23 @@
     const currentIndex = themes.indexOf($settings.theme);
     const theme = themes[(currentIndex + 1) % themes.length];
     void updateSettings({ theme });
+  };
+
+  const toggleAmbientSound = async () => {
+    if ($ambientSoundPlaying) {
+      stopAmbientSound();
+      statusMessage = 'Ambient sound stopped.';
+      return;
+    }
+
+    const ambientSound = $settings.ambientSound === 'none' ? 'rain' : $settings.ambientSound;
+
+    if ($settings.ambientSound === 'none') {
+      await updateSettings({ ambientSound });
+    }
+
+    const started = startAmbientSound({ ambientSound, ambientVolume: $settings.ambientVolume });
+    statusMessage = started ? `Playing ${ambientSound.replace('-', ' ')}.` : 'Choose an ambient sound first.';
   };
 
   const exportActiveDraft = async (format: 'markdown' | 'txt' | 'pdf') => {
@@ -67,6 +89,11 @@
     {
       label: 'Toggle Typewriter Mode',
       run: () => updateSettings({ typewriterMode: !$settings.typewriterMode })
+    },
+    {
+      label: 'Toggle Ambient Sound',
+      run: toggleAmbientSound,
+      closeOnRun: false
     },
     {
       label: 'Open Drafts Folder',

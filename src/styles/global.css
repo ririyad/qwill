@@ -488,7 +488,8 @@ button {
 }
 
 .new-draft-button,
-.theme-toggle {
+.theme-toggle,
+.settings-button {
   height: 36px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -608,6 +609,18 @@ button {
   padding: 0 8px;
   background: var(--color-surface);
   color: var(--color-text);
+}
+
+.sound-control {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.sound-control p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
 }
 
 .settings-toggles {
